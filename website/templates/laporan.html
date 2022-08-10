@@ -42,6 +42,10 @@
                 <td>{{ laporan.solar_awal }}</td>
               </tr>
               <tr>
+                <th scope="row">E-Toll</th>
+                <td>{{ 'Rp. '+ laporan.e_toll|string }}</td>
+              </tr>
+              <tr>
                 <th scope="row">Perbandingan</th>
                 <td>{% if laporan.solar_awal == 0 %}
                   {{ '0' }}

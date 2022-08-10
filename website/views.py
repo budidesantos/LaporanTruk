@@ -1,8 +1,9 @@
 from turtle import title
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
+from sqlalchemy import desc
 from .models import Laporan
-from datetime import datetime
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, IntegerField, TextAreaField
 from wtforms.validators import DataRequired
@@ -20,14 +21,15 @@ class LaporanForm(FlaskForm):
     sopir = StringField('Nama Sopir', validators=[DataRequired()])
     km_awal = IntegerField('KM Awal', validators=[DataRequired()])
     km_isi = IntegerField('KM Isi')
-    solar_awal = IntegerField('Solar Awal', validators=[DataRequired()])
+    solar_awal = IntegerField('Solar Awal (L)')
+    e_toll = IntegerField('E-Toll')
     tujuan = TextAreaField('Tujuan')
-    submit = SubmitField('Submit') 
+    submit = SubmitField('Submit')
 
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    list_laporan = Laporan.query.all()
+    list_laporan = Laporan.query.order_by(desc(Laporan.tanggal))
     return render_template("home.html", user=current_user, laporan=list_laporan)
 
 @views.route('/laporan/<int:id>')
@@ -46,17 +48,8 @@ def add_laporan():
         km_awal = form.km_awal.data
         km_isi = form.km_isi.data
         solar_awal = form.solar_awal.data
+        e_toll = form.e_toll.data
         tujuan = form.tujuan.data
-
-
-        # date = request.form.get('date')
-        # y, m, d = date.split('-')
-        # nopol = request.form.get('nopol').upper()
-        # sopir = request.form.get('sopir')
-        # km_awal = request.form.get('km_awal')
-        # km_isi = request.form.get('km_isi')
-        # solar_awal = request.form.get('solar_awal')
-        # tujuan = request.form.get('tujuan')
 
         cek_nopol = Laporan.query.filter_by(nopol=nopol).first()
         cek_tgl = Laporan.query.filter_by(tanggal=tanggal).first()
@@ -69,12 +62,12 @@ def add_laporan():
 
         if solar_awal =="":
             solar_awal = 0
-        # datetime(int(y), int(m), int(d))
+            
         if cek_nopol and cek_tgl:
             flash('Nomor Polisi sudah ada di tanggal yang sama.', category='error')
         else :
             new_post = Laporan(tanggal=tanggal, nopol=nopol, sopir=sopir, km_awal=km_awal, 
-            km_isi=km_isi, solar_awal=solar_awal, tujuan=tujuan, username=current_user.username)
+            km_isi=km_isi, solar_awal=solar_awal, e_toll=e_toll, tujuan=tujuan, username=current_user.username)
             db.session.add(new_post)
             db.session.commit()
             return redirect(url_for('views.home'))
@@ -87,7 +80,6 @@ def add_laporan():
 def update_laporan(id):
     laporan = Laporan.query.get_or_404(id)
     form = LaporanForm()
-    print(laporan.tanggal)
     if laporan.username != current_user.username:
         abort(403)
     if form.validate_on_submit():
@@ -97,6 +89,7 @@ def update_laporan(id):
         laporan.km_awal = form.km_awal.data
         laporan.km_isi = form.km_isi.data
         laporan.solar_awal = form.solar_awal.data
+        laporan.e_toll = form.e_toll.data
         laporan.tujuan = form.tujuan.data
         db.session.commit()
         flash('Data laporan berhasil diupdate!', 'success')
@@ -108,6 +101,7 @@ def update_laporan(id):
         form.km_awal.data = laporan.km_awal
         form.km_isi.data = laporan.km_isi
         form.solar_awal.data = laporan.solar_awal
+        form.e_toll.data = laporan.e_toll
         form.tujuan.data = laporan.tujuan
     return render_template('add_laporan.html', title="Update Laporan", form = form, user=current_user)
 
@@ -121,26 +115,4 @@ def delete_laporan(id):
     db.session.commit()
     flash('Laporan berhasil dihapus', 'success')
     return redirect(url_for('views.home'))
-    
-
-# # Aktivitas
-# @views.route('/update-aktivitas', methods=['GET', 'POST'])
-# def update_aktivitas():
-#     if request.method == 'POST':
-#         status = Aktivitas.query.get(request.form.get('status'))
-#         status.name = "finished"
-#         db.session.commit()
-
-#     return render_template("home.html", user=current_user)
-
-# @views.route('/delete-aktivitas', methods=['POST'])
-# def delete_aktivitas():
-#     aktivitas = json.loads(request.data)
-#     IdAktivitas = aktivitas['IdAktivitas']
-#     aktivitas = Aktivitas.query.get(IdAktivitas)
-#     if aktivitas:
-#         if aktivitas.username == current_user.username:
-#             db.session.delete(aktivitas)
-#             db.session.commit()
-
-#     return jsonify({})
+  

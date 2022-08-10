@@ -84,6 +84,19 @@
                 {% endif %}
             </div>
             <div class="form-group">
+                {{ form.e_toll.label(class="form-control-label") }}
+                {% if form.e_toll.errors %}
+                    {{ form.e_toll(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.e_toll.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.e_toll(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
                 {{ form.tujuan.label(class="form-control-label") }}
                 {% if form.tujuan.errors %}
                     {{ form.tujuan(class="form-control form-control-lg is-invalid") }}

@@ -1,5 +1,4 @@
 from enum import unique
-from time import timezone
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
@@ -14,6 +13,7 @@ class Laporan(db.Model):
     km_isi = db.Column(db.Integer)
     solar_awal = db.Column(db.Integer)
     tujuan = db.Column(db.String(500))
+    e_toll = db.Column(db.Integer)
     username = db.Column(db.String(150), db.ForeignKey('user.username'))
     # img = db.relationship('image')
 
