@@ -1,0 +1,92 @@
+{% extends "base.html" %} {% block title %}App Laporan Truk{% endblock %} 
+    {% block content %}
+    <h1 align="center">Daftar Laporan</h1>
+    <ul class="list-group list-group-flush" id="aktivitas">
+      <table class="table table-striped-columns">
+        <thead>
+          <tr>
+            <th scope="col">Tanggal</th>
+            <th scope="col">Nomor Polisi</th>
+            <th scope="col">Sopir</th>
+            <th scope="col">Jarak (KM)</th>
+          </tr>
+        </thead>
+      {% for list in laporan %}
+        <tbody>
+          <tr>
+            <td><a href="{{ url_for('views.laporan', id=list.id) }}" class="link-dark">{{ list.tanggal }}</a></td>
+            <td><a href="{{ url_for('views.laporan', id=list.id) }}" class="link-dark">{{ list.nopol }}</a></td>
+            <td><a href="{{ url_for('views.laporan', id=list.id) }}" class="link-dark">{{ list.sopir }}</a></td>
+            <td><a href="{{ url_for('views.laporan', id=list.id) }}" class="link-dark">{{ list.km_isi-list.km_awal }}</a></td>
+            <!-- <td>
+              <button type="button" class="btn btn-light btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
+                  <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                </svg>
+                <i class="bi bi-check2"></i>
+              </button>
+              <button type="button" class="btn btn-light btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
+                  <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
+                </svg>
+                <i class="bi bi-lightning-charge-fill"></i>
+              </button>
+              <button type="button" class="close" onClick="deleteAktivitas({{ list.id }})">
+              <span aria-hidden="true">&times;</span>
+              </button>
+            </td>  -->
+          </tr>
+        </tbody>
+      {% endfor %}
+
+<!--     
+    <ul class="list-group list-group-flush" id="aktivitas">
+      <table class="table table-striped-columns">
+        <thead>
+          <tr>
+            <th scope="col">Username</th>
+            <th scope="col">Aktivitas</th>
+            <th scope="col">Tanggal</th>
+            <th scope="col">Waktu</th>
+            <th scope="col">Status</th>
+            <th scope="col">#</th>
+          </tr>
+        </thead>
+        {% for list in user.aktivitas %}
+        <tbody>
+          <tr>
+            <td>{{ list.username }}</td>
+            <td>{{ list.nama_aktivitas }}</td>
+            <td>{{ list.tgl_aktivitas }}</td>
+            <td>{{ list.waktu_aktivitas }}</td>
+            <td>{{ list.status }}</td>
+            <td>
+              <button type="button" class="btn btn-light btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
+                  <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                </svg>
+                <i class="bi bi-check2"></i>
+              </button>
+              <button type="button" class="btn btn-light btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lightning-charge-fill" viewBox="0 0 16 16">
+                  <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/>
+                </svg>
+                <i class="bi bi-lightning-charge-fill"></i>
+              </button>
+              <button type="button" class="close" onClick="deleteAktivitas({{ list.id }})">
+              <span aria-hidden="true">&times;</span>
+              </button>
+            </td> 
+          </tr>
+        </tbody>
+      {% endfor %}
+    </table>
+    </ul>
+    <form method="POST">
+      <textarea name="aktivitas" id="aktivitas" class="form-control"></textarea>
+      <br/>
+      <div align="center">
+        <button type="submit" class="btn btn-primary">Tambah Aktivitas</button>
+      </div>
+    </form>
+    {% endblock %} -->
