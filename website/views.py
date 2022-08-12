@@ -116,5 +116,42 @@ def delete_laporan(id):
     flash('Laporan berhasil dihapus', 'success')
     return redirect(url_for('views.home'))
 
+@views.route('/nopol', methods=['GET'])
+@login_required
+def get_nopol_list():
+    list_laporan = Laporan.query.order_by(desc(Laporan.nopol))
+    list_nopol = []
+    for list in list_laporan:
+        if list.nopol in list_nopol:
+            continue
+        else:
+            list_nopol.append(list.nopol)
+    return render_template('list.html', title="List Nomor Polisi",  nopol=list_nopol, user=current_user)
 
-  
+@views.route('/sopir', methods=['GET'])
+@login_required
+def get_sopir_list():
+    list_laporan = Laporan.query.order_by(desc(Laporan.sopir))
+    list_sopir = []
+    for list in list_laporan:
+        if list.sopir in list_sopir:
+            continue
+        else:
+            list_sopir.append(list.sopir)
+    return render_template('list.html', title="List Sopir",  nopol=list_sopir, user=current_user)
+
+
+# def get_sopir_list():
+#     list_laporan = Laporan.query.order_by(desc(Laporan.sopir))
+#     list_sopir = []
+#     for list in list_laporan:
+#         if list.sopir in list_sopir:
+#             continue
+#         else:
+#             list_sopir.append(list.name)
+#     return list_sopir
+
+
+
+# print(get_sopir_list())
+# print(get_nopol_list())
