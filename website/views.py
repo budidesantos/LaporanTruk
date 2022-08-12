@@ -1,18 +1,15 @@
-from turtle import title
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import desc
 from .models import Laporan
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField, IntegerField, TextAreaField
+from wtforms import StringField, SubmitField, DateField, IntegerField, TextAreaField, DecimalField
 from wtforms.validators import DataRequired
 from . import db
 import json
 
 views = Blueprint('views', __name__)
-
-# ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 # Form untuk Laporan (add & update)
 class LaporanForm(FlaskForm):
@@ -21,7 +18,7 @@ class LaporanForm(FlaskForm):
     sopir = StringField('Nama Sopir', validators=[DataRequired()])
     km_awal = IntegerField('KM Awal', validators=[DataRequired()])
     km_isi = IntegerField('KM Isi')
-    solar_awal = IntegerField('Solar Awal (L)')
+    solar_awal = DecimalField('Solar Awal (L)')
     e_toll = IntegerField('E-Toll')
     tujuan = TextAreaField('Tujuan')
     submit = SubmitField('Submit')
@@ -29,7 +26,8 @@ class LaporanForm(FlaskForm):
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    list_laporan = Laporan.query.order_by(desc(Laporan.tanggal))
+    page = request.args.get('page', 1, type=int)
+    list_laporan = Laporan.query.order_by(desc(Laporan.tanggal)).paginate(page = page, per_page=20)
     return render_template("home.html", user=current_user, laporan=list_laporan)
 
 @views.route('/laporan/<int:id>')
@@ -44,7 +42,7 @@ def add_laporan():
     if form.validate_on_submit():
         tanggal = form.tanggal.data
         nopol = form.nopol.data.upper()
-        sopir = form.sopir.data
+        sopir = form.sopir.data.upper()
         km_awal = form.km_awal.data
         km_isi = form.km_isi.data
         solar_awal = form.solar_awal.data
@@ -53,6 +51,7 @@ def add_laporan():
 
         cek_nopol = Laporan.query.filter_by(nopol=nopol).first()
         cek_tgl = Laporan.query.filter_by(tanggal=tanggal).first()
+        cek_sopir = Laporan.query.filter_by(sopir=sopir).first()
 
         if km_awal =="":
             km_awal = 0
@@ -65,6 +64,8 @@ def add_laporan():
             
         if cek_nopol and cek_tgl:
             flash('Nomor Polisi sudah ada di tanggal yang sama.', category='error')
+        elif cek_sopir and cek_tgl: 
+            flash('Sopir sudah ada di tanggal yang sama.', category='error')
         else :
             new_post = Laporan(tanggal=tanggal, nopol=nopol, sopir=sopir, km_awal=km_awal, 
             km_isi=km_isi, solar_awal=solar_awal, e_toll=e_toll, tujuan=tujuan, username=current_user.username)
@@ -73,7 +74,6 @@ def add_laporan():
             return redirect(url_for('views.home'))
 
     return render_template("add_laporan.html", title="Tambah Laporan", form = form, user=current_user)
-
 
 @views.route('/laporan/<int:id>/update', methods=['GET', 'POST'])
 @login_required
@@ -84,8 +84,8 @@ def update_laporan(id):
         abort(403)
     if form.validate_on_submit():
         laporan.tanggal = form.tanggal.data
-        laporan.nopol = form.nopol.data
-        laporan.sopir = form.sopir.data
+        laporan.nopol = form.nopol.data.upper()
+        laporan.sopir = form.sopir.data.upper()
         laporan.km_awal = form.km_awal.data
         laporan.km_isi = form.km_isi.data
         laporan.solar_awal = form.solar_awal.data
@@ -115,4 +115,6 @@ def delete_laporan(id):
     db.session.commit()
     flash('Laporan berhasil dihapus', 'success')
     return redirect(url_for('views.home'))
+
+
   

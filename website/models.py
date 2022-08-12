@@ -11,7 +11,7 @@ class Laporan(db.Model):
     tujuan = db.Column(db.String(500))
     km_awal = db.Column(db.Integer)
     km_isi = db.Column(db.Integer)
-    solar_awal = db.Column(db.Integer)
+    solar_awal = db.Column(db.Float)
     tujuan = db.Column(db.String(500))
     e_toll = db.Column(db.Integer)
     username = db.Column(db.String(150), db.ForeignKey('user.username'))
