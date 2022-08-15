@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-    {% block content %}
-    <h1 align="center">{% block title %} {{ title }} {% endblock %}</h1>
-    <div class="list-group">
-        {% for list in data %}
-        <a href="#" class="list-group-item list-group-item-action">{{ list }}</a>
-        {% endfor %}
-    </div>
-    {% endblock %}

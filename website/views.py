@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from sqlalchemy import desc
 from .models import Laporan
+from collections import OrderedDict
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, IntegerField, TextAreaField, DecimalField
@@ -121,37 +122,42 @@ def delete_laporan(id):
 def get_nopol_list():
     list_laporan = Laporan.query.order_by(desc(Laporan.nopol))
     list_nopol = []
+    jum_list = []
     for list in list_laporan:
         if list.nopol in list_nopol:
-            continue
+            jum_list[list_nopol.index(list.nopol)] += 1
         else:
             list_nopol.append(list.nopol)
-    return render_template('list.html', title="List Nomor Polisi",  data=list_nopol, user=current_user)
+            jum_list.append(1)
+    data = sorted(zip(jum_list, list_nopol), key = lambda x: (-x[0], x[1]))
+    return render_template('list_nopol.html', title="List Nomor Polisi",  data=data, user=current_user)
 
 @views.route('/sopir', methods=['GET'])
 @login_required
 def get_sopir_list():
     list_laporan = Laporan.query.order_by(desc(Laporan.sopir))
     list_sopir = []
+    jum_list = []
     for list in list_laporan:
         if list.sopir in list_sopir:
-            continue
+            jum_list[list_sopir.index(list.sopir)] += 1
         else:
             list_sopir.append(list.sopir)
-    return render_template('list.html', title="List Sopir",  data=list_sopir, user=current_user)
+            jum_list.append(1)
+    data = sorted(zip(jum_list, list_sopir), key = lambda x: (-x[0], x[1]))
+    return render_template('list_sopir.html', title="List Sopir",  data=data, user=current_user)
 
 
-# def get_sopir_list():
-#     list_laporan = Laporan.query.order_by(desc(Laporan.sopir))
-#     list_sopir = []
-#     for list in list_laporan:
-#         if list.sopir in list_sopir:
-#             continue
-#         else:
-#             list_sopir.append(list.name)
-#     return list_sopir
+@views.route('/nopol/<nopol>', methods=['GET'])
+@login_required
+def laporan_nopol(nopol):
+    page = request.args.get('page', 1, type=int)
+    list_laporan = Laporan.query.filter(Laporan.nopol==nopol).order_by(desc(Laporan.tanggal)).paginate(page = page, per_page=20)
+    return render_template("home.html", user=current_user, laporan=list_laporan)
 
-
-
-# print(get_sopir_list())
-# print(get_nopol_list())
+@views.route('/spoir/<sopir>', methods=['GET'])
+@login_required
+def laporan_sopir(sopir):
+    page = request.args.get('page', 1, type=int)
+    list_laporan = Laporan.query.filter(Laporan.sopir==sopir).order_by(desc(Laporan.tanggal)).paginate(page = page, per_page=20)
+    return render_template("home.html", user=current_user, laporan=list_laporan)
