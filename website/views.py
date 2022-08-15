@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, Response
 from flask_login import login_required, current_user
 from sqlalchemy import desc
 from .models import Laporan
-from collections import OrderedDict
+import xlwt
+import io
+
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField, IntegerField, TextAreaField, DecimalField
@@ -155,9 +157,46 @@ def laporan_nopol(nopol):
     list_laporan = Laporan.query.filter(Laporan.nopol==nopol).order_by(desc(Laporan.tanggal)).paginate(page = page, per_page=20)
     return render_template("home.html", user=current_user, laporan=list_laporan)
 
-@views.route('/spoir/<sopir>', methods=['GET'])
+@views.route('/sopir/<sopir>', methods=['GET'])
 @login_required
 def laporan_sopir(sopir):
     page = request.args.get('page', 1, type=int)
     list_laporan = Laporan.query.filter(Laporan.sopir==sopir).order_by(desc(Laporan.tanggal)).paginate(page = page, per_page=20)
     return render_template("home.html", user=current_user, laporan=list_laporan)
+
+@views.route('/download/laporan/<data>', methods=['GET'])
+def download_laporan(data):
+    try:
+        output = io.BytesIO()
+
+        workbook = xlwt.Workbook()
+
+        dl = workbook.add_sheet('Laporan Truk')
+
+        dl.write(0, 1, 'Tanggal Laporan')
+        dl.write(0, 2, 'Nomor Polisi')
+        dl.write(0, 3, 'Nama Sopir')
+        dl.write(0, 4, 'KM Awal')
+        dl.write(0, 5, 'KM Isi')
+        dl.write(0, 6, 'Isi Solar Awal')
+        dl.write(0, 7, 'Tujuan')
+        dl.write(0, 8, 'E-Toll')
+    
+        idx = 0
+        for row in data:
+            dl.write(idx+1, 1, str(row.tanggal))
+            dl.write(idx+1, 2, row.nopol)
+            dl.write(idx+1, 3, row.sopir)
+            dl.write(idx+1, 4, row.km_awal)
+            dl.write(idx+1, 5, row.km_isi)
+            dl.write(idx+1, 6, row.solar_awal)
+            dl.write(idx+1, 7, row.tujuan)
+            dl.write(idx+1, 8, row.e_toll)
+            idx += 1
+
+        workbook.save(output)
+        output.seek(0)
+
+        return Response(output, mimetype="application/ms-excel", headers={"Content-Disposition":"attachment;filename=download.xls"})
+    except Exception as e:
+	    print(e)

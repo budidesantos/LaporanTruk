@@ -23,9 +23,10 @@
         </tbody>
       {% endfor %}
       </table>
-
-      <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-end">
+      <a class="btn btn-secondary btn-sm mt-1 mb-1 col-3" href="{{ url_for('.download_laporan', data=laporan) }}">Download</a>
+        <nav aria-label="Page navigation example">
+          <span>
+          <ul class="pagination justify-content-end">
           {% if laporan.has_prev %}
           <li class="page-item"><a class="page-link" href="{{ url_for('views.home', page=laporan.prev_num) }}">Previous</a></li>
           {% endif %}
@@ -43,6 +44,7 @@
           {% if laporan.has_next %}
           <li class="page-item"><a class="page-link" href="{{ url_for('views.home', page=laporan.next_num) }}">Next</a></li>
           {% endif %}
-        </ul>
-      </nav>
+          </ul>
+        </nav>
+
     {% endblock %}
